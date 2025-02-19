@@ -1,7 +1,8 @@
 import torch
 from config import BATCH_SIZE
 
-def create_batches(dataset):
+def create_batches(dataset, split):
+    dataset = [x for x in dataset if x['split'] == split]
     # Create DataLoader with specified batch size
     dataloader = torch.utils.data.DataLoader(
         dataset,
@@ -17,9 +18,9 @@ def create_batches_for_each_split(dataset):
         validation_batches = torch.load('data_cache/validation_batches.pt') 
         test_batches = torch.load('data_cache/test_batches.pt')
     except:
-        train_batches = create_batches(dataset.filter(lambda x: x['split'] == 'train'))
-        validation_batches = create_batches(dataset.filter(lambda x: x['split'] == 'val'))
-        test_batches = create_batches(dataset.filter(lambda x: x['split'] == 'test'))
+        train_batches = create_batches(dataset, 'train')
+        validation_batches = create_batches(dataset, 'val')
+        test_batches = create_batches(dataset, 'test')
         
         # Cache the batches
         torch.save(train_batches, 'data_cache/train_batches.pt')
