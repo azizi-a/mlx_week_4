@@ -37,7 +37,7 @@ def process_dataset():
     try:
         ds = datasets.load_from_disk("data_cache/processed_dataset")
     except:
-        ds = datasets.load_dataset("nlphuji/flickr30k", cache_dir="./data_cache")
+        ds = datasets.load_dataset("nlphuji/flickr30k", cache_dir="data_cache")
         print("Processing dataset...")
         ds = ds.map(process_example)
         ds.save_to_disk("data_cache/processed_dataset")
