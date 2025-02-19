@@ -3,7 +3,7 @@ import torchvision
 from PIL import Image
 import numpy as np
 
-def resize_with_padding(image, target_size=256):
+def resize_with_padding(image, target_size=224):
     # Convert to PIL Image if needed
     if not isinstance(image, Image.Image):
         image = Image.fromarray(np.uint8(image))
