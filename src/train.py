@@ -80,5 +80,10 @@ if __name__ == "__main__":
     # Save model weights
     torch.save(decoder.state_dict(), "model_weights.pt")
 
+    # Save model weights to wandb
+    artifact = wandb.Artifact("model_weights", type="model")
+    artifact.add_file("model_weights.pt")
+    wandb.log_artifact(artifact)
+
     # Finish the wandb run
     wandb.finish()
