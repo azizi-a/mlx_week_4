@@ -1,5 +1,6 @@
 import transformers
 import torch
+import numpy as np
 
 MODEL_NAME = "openai/clip-vit-base-patch32"
 
@@ -18,7 +19,8 @@ def encode_image(image_batch):
 
 
 def tokenize_text(caption_batch):
-    caption_count = len(caption_batch[0])
+    ca = np.array(caption_batch)
+    caption_count = ca.shape[0]
 
     # Flatten the captions into a single list
     flattened_captions = []
@@ -38,11 +40,13 @@ def tokenize_text(caption_batch):
 
 
 def encode_data_batch(data_batch):
-    image_features = encode_image(data_batch["image"])
-    caption_encodings, caption_features, caption_count = tokenize_text(
-        data_batch["caption"]
-    )
-    repeated_image_features = image_features.repeat_interleave(5, dim=0)
+    image_batch = data_batch["image"]
+    caption_batch = data_batch["caption"]
+
+    image_features = image_batch
+    text_outputs = tokenize_text(caption_batch)
+    caption_encodings, caption_features, caption_count = text_outputs
+    repeated_image_features = image_features.repeat_interleave(caption_count, dim=0)
 
     encoded_data_batch = {
         "image_features": repeated_image_features,

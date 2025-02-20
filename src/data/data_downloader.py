@@ -1,6 +1,6 @@
 import torch
 import datasets
-import numpy as np
+from encoder.encode import encode_image
 
 
 class DataDownloader(torch.utils.data.Dataset):
@@ -20,7 +20,7 @@ class DataDownloader(torch.utils.data.Dataset):
             num_items = len(items["image"])
             return [
                 {
-                    "image": np.array(items["image"][i]),
+                    "image": encode_image(items["image"][i]),
                     "caption": items["caption"][i],
                     "split": items["split"][i],
                 }
@@ -29,7 +29,7 @@ class DataDownloader(torch.utils.data.Dataset):
 
         item = self.ds[idx]
         return {
-            "image": np.array(item["image"]),
+            "image": encode_image(item["image"]),
             "caption": item["caption"],
             "split": item["split"],
         }

@@ -21,7 +21,7 @@ class Decoder(nn.Module):
 
     def forward(self, caption, image):
         caption = self.embedding(caption)
-        caption = torch.cat([image.unsqueeze(1), caption], dim=1)
+        caption = torch.cat([image, caption], dim=1)
         caption = self.norm_1(caption)
         image = self.norm_1(image)
         size = caption.size(1)
