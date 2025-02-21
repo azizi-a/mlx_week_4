@@ -23,21 +23,21 @@ def epoch_loop(batches, name, decoder, device, optimizer=None):
     next_word_probs = decoder(caption_encodings, image_features)
 
     loss = calculate_loss(next_word_probs, caption_encodings)
-    average_loss = loss / batch_size
-    total_loss += average_loss
+    total_loss += loss
 
-    pbar.set_postfix(loss=f"{average_loss.item():.4f}")
+    pbar.set_postfix(loss=f"{loss.item():.4f}")
 
     wandb.log(
       {
         f"{name}_batch_size": batch_size,
-        f"{name}_loss": average_loss,
+        f"{name}_loss": loss,
       }
     )
 
     if optimizer:
       optimizer.zero_grad()
       loss.backward()
+      wandb.log({"gradient_norm": torch.nn.utils.clip_grad_norm_(decoder.parameters(), float("inf"))})
       optimizer.step()
 
   return total_loss / len(batches)
