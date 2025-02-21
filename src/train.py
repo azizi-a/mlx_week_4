@@ -10,13 +10,13 @@ from utils.get_datasets import get_datasets
 CLIPModel = transformers.CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 
 
-def epoch_loop(batches, name, decoder, optimizer=None):
+def epoch_loop(batches, name, decoder, device, optimizer=None):
   total_loss = 0
   for batch in tqdm(batches):
     batch_size = batch[0].shape[0]
 
-    caption_encodings = batch[0]
-    image_features = CLIPModel.get_image_features(batch[1])
+    caption_encodings = batch[0].to(device)
+    image_features = CLIPModel.get_image_features(batch[1].to(device))
 
     next_word_probs = decoder(caption_encodings, image_features)
 
@@ -40,6 +40,8 @@ def epoch_loop(batches, name, decoder, optimizer=None):
 
 
 if __name__ == "__main__":
+  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
   train_ds, val_ds = get_datasets()
 
   print("train_ds len", len(train_ds))
@@ -61,13 +63,13 @@ if __name__ == "__main__":
   )
 
   vocab_size = train_ds.tokenizer.vocab_size
-  decoder = Decoder(vocab_size)
+  decoder = Decoder(vocab_size).to(device)
 
   for epoch in range(EPOCHS):
     optimizer = torch.optim.Adam(decoder.parameters(), lr=LEARNING_RATE)
 
-    train_loss = epoch_loop(train_batches, "train", decoder, optimizer)
-    val_loss = epoch_loop(val_batches, "val", decoder)
+    train_loss = epoch_loop(train_batches, "train", decoder, device, optimizer)
+    val_loss = epoch_loop(val_batches, "val", decoder, device)
 
     wandb.log(
       {
