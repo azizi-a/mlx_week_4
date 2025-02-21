@@ -1,7 +1,7 @@
 # Training hyperparameters
 LEARNING_RATE = 0.001
-BATCH_SIZE = 64
-EPOCHS = 10
+BATCH_SIZE = 32
+EPOCHS = 8
 ATTENTION_HEAD_COUNT = 8
 
 # Model hyperparameters

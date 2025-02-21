@@ -18,7 +18,14 @@ class Flick(torch.utils.data.Dataset):
     itm = self.ds[idx]
     img = itm["image"]
     txt = itm["caption"][0]
-    enc = self.processor(text=txt, images=img, return_tensors="pt")
+    enc = self.processor(
+      text=txt,
+      images=img,
+      return_tensors="pt",
+      truncation=True,
+      max_length=75,
+      padding="max_length",
+    )
     img = enc["pixel_values"].squeeze()
     tkn = enc["input_ids"].squeeze()[:75]
     return tkn, img
