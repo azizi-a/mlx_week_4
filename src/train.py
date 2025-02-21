@@ -47,8 +47,18 @@ if __name__ == "__main__":
   print("train_ds len", len(train_ds))
   print("val_ds len", len(val_ds))
 
-  train_batches = torch.utils.data.DataLoader(train_ds, batch_size=64, shuffle=True, collate_fn=train_ds.collate)
-  val_batches = torch.utils.data.DataLoader(val_ds, batch_size=64, shuffle=True, collate_fn=val_ds.collate)
+  train_batches = torch.utils.data.DataLoader(
+    train_ds,
+    batch_size=BATCH_SIZE,
+    shuffle=True,
+    collate_fn=train_ds.collate,
+  )
+  val_batches = torch.utils.data.DataLoader(
+    val_ds,
+    batch_size=BATCH_SIZE,
+    shuffle=True,
+    collate_fn=val_ds.collate,
+  )
 
   print(f"Number of training batches: {len(train_batches)}")
   print(f"Number of validation batches: {len(val_batches)}")
