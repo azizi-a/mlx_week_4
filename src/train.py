@@ -42,7 +42,7 @@ def epoch_loop(batches, name, decoder, device, optimizer=None):
 if __name__ == "__main__":
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-  train_ds, val_ds = get_datasets()
+  train_ds, val_ds, _ = get_datasets()
 
   print("train_ds len", len(train_ds))
   print("val_ds len", len(val_ds))

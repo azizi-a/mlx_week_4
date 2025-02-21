@@ -18,4 +18,11 @@ def get_datasets():
     os.makedirs("data_cache", exist_ok=True)
     torch.save(val_ds, "data_cache/val_ds.pt")
 
-  return train_ds, val_ds
+  if os.path.exists("data_cache/test_ds.pt"):
+    test_ds = torch.load("data_cache/test_ds.pt", weights_only=False)
+  else:
+    test_ds = Flick(split="test")
+    os.makedirs("data_cache", exist_ok=True)
+    torch.save(test_ds, "data_cache/test_ds.pt")
+
+  return train_ds, val_ds, test_ds
