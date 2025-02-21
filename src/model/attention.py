@@ -33,6 +33,7 @@ class Attention(nn.Module):
     a = torch.matmul(q, k.transpose(-2, -1)) / torch.sqrt(torch.tensor(self.head_dim, dtype=torch.float32))
     # mask is 0 for valid positions, 1 for invalid positions
     if mask is not None:
+      mask = mask.to(a.device)
       a = a.masked_fill(mask != 0, float("-inf"))
     a = torch.softmax(a, dim=-1)
     dx = torch.matmul(a, v)

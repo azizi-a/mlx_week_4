@@ -7,7 +7,8 @@ from utils.loss import calculate_loss
 from tqdm import tqdm
 from utils.get_datasets import get_datasets
 
-CLIPModel = transformers.CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+CLIPModel = transformers.CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(device)
 
 
 def epoch_loop(batches, name, decoder, device, optimizer=None):
