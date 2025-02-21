@@ -83,7 +83,8 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(decoder.parameters(), lr=LEARNING_RATE)
 
     train_loss = epoch_loop(train_batches, "train", decoder, device, optimizer)
-    val_loss = epoch_loop(val_batches, "val", decoder, device)
+    with torch.no_grad():
+      val_loss = epoch_loop(val_batches, "val", decoder, device)
 
     wandb.log(
       {
