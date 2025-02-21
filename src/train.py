@@ -13,7 +13,8 @@ CLIPModel = transformers.CLIPModel.from_pretrained("openai/clip-vit-base-patch32
 
 def epoch_loop(batches, name, decoder, device, optimizer=None):
   total_loss = 0
-  for batch in tqdm(batches):
+  pbar = tqdm(batches)
+  for batch in pbar:
     batch_size = batch[0].shape[0]
 
     caption_encodings = batch[0].to(device)
@@ -24,6 +25,8 @@ def epoch_loop(batches, name, decoder, device, optimizer=None):
     loss = calculate_loss(next_word_probs, caption_encodings)
     average_loss = loss / batch_size
     total_loss += average_loss
+
+    pbar.set_postfix(loss=f"{average_loss.item():.4f}")
 
     wandb.log(
       {
