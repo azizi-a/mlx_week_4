@@ -10,7 +10,7 @@ _, _, test_ds = get_datasets()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 decoder = Decoder(test_ds.tokenizer.vocab_size).to(device)
-decoder.load_state_dict(torch.load("model_weights.pt"))
+decoder.load_state_dict(torch.load("model_weights.pt", map_location=device))
 decoder.eval()
 
 
@@ -35,10 +35,8 @@ def predict_caption(image):
   # Get predictions
   with torch.no_grad():
     predicted_word_tokens = text_input
-    i = 0
-    while predicted_word_tokens[-1][-1].item() != end_token and i < 100:
-      i += 1
-      next_word_probs = decoder(text_input, image_features)
+    while predicted_word_tokens[-1][-1].item() != end_token and predicted_word_tokens.shape[1] < 32:
+      next_word_probs = decoder(predicted_word_tokens, image_features)
       next_word_tokens = next_word_probs.argmax(dim=2)
       predicted_word_tokens = torch.cat((predicted_word_tokens, next_word_tokens), dim=1)
 
@@ -46,7 +44,7 @@ def predict_caption(image):
   return predicted_words
 
 
-def display_test_image(image, caption):
+def display_test_image(image, title):
   # Denormalize the image tensor
   denorm = torchvision.transforms.Normalize(
     mean=[-0.485 / 0.229, -0.456 / 0.224, -0.406 / 0.225], std=[1 / 0.229, 1 / 0.224, 1 / 0.225]
@@ -60,7 +58,7 @@ def display_test_image(image, caption):
   import matplotlib.pyplot as plt
 
   plt.imshow(image_pil)
-  plt.title(caption)
+  plt.title(title)
   plt.axis("off")
   plt.show()
 
@@ -69,7 +67,14 @@ if __name__ == "__main__":
   image, caption = get_test_item()
   predicted_caption = predict_caption(image)
 
-  print("Original caption:", test_ds.tokenizer.decode(caption))
+  caption = (
+    test_ds.tokenizer.decode(caption).replace(test_ds.tokenizer.bos_token, "").replace(test_ds.tokenizer.eos_token, "")
+  )
+  predicted_caption = predicted_caption.replace(test_ds.tokenizer.bos_token, "").replace(
+    test_ds.tokenizer.eos_token, ""
+  )
+
+  print("Original caption:", caption)
   print("Predicted words:", predicted_caption)
 
-  display_test_image(image, predict_caption)
+  display_test_image(image, predicted_caption)
