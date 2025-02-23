@@ -1,7 +1,7 @@
 import wandb
 import torch
 import transformers
-from config import BATCH_SIZE, EPOCHS, LEARNING_RATE
+from config import BATCH_SIZE, EPOCHS, LEARNING_RATE, LEARNING_RATE_DECAY
 from model.decoder import Decoder
 from utils.loss import calculate_loss
 from tqdm import tqdm
@@ -25,7 +25,7 @@ def epoch_loop(batches, name, decoder, device, optimizer=None):
     loss = calculate_loss(next_word_probs, caption_encodings)
     total_loss += loss
 
-    pbar.set_postfix(loss=f"{loss.item():.4f}")
+    pbar.set_postfix(**{f"{name}_loss": f"{loss.item():.4f}"})
 
     wandb.log(
       {
@@ -80,7 +80,8 @@ if __name__ == "__main__":
   decoder = Decoder(vocab_size).to(device)
 
   for epoch in range(EPOCHS):
-    optimizer = torch.optim.Adam(decoder.parameters(), lr=LEARNING_RATE)
+    lr = LEARNING_RATE * (LEARNING_RATE_DECAY**epoch)
+    optimizer = torch.optim.Adam(decoder.parameters(), lr=lr)
 
     train_loss = epoch_loop(train_batches, "train", decoder, device, optimizer)
     with torch.no_grad():
