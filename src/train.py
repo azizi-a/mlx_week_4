@@ -18,7 +18,8 @@ def epoch_loop(batches, name, decoder, device, optimizer=None):
     batch_size = batch[0].shape[0]
 
     caption_encodings = batch[0].to(device)
-    image_features = CLIPModel.get_image_features(batch[1].to(device))
+    with torch.no_grad():
+      image_features = CLIPModel.get_image_features(batch[1].to(device))
 
     next_word_probs = decoder(caption_encodings, image_features)
 

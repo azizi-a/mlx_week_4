@@ -26,7 +26,8 @@ def get_test_item():
 
 
 def predict_caption(image):
-  image_features = CLIPModel.get_image_features(image.unsqueeze(0))
+  with torch.no_grad():
+    image_features = CLIPModel.get_image_features(image.unsqueeze(0))
   start_token = test_ds.tokenizer.bos_token_id
   end_token = test_ds.tokenizer.eos_token_id
 
