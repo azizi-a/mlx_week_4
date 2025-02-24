@@ -1,6 +1,7 @@
 import torch
 import transformers
 import torchvision
+import matplotlib.pyplot as plt
 from utils.get_datasets import get_datasets
 from model.decoder import Decoder
 
@@ -9,6 +10,8 @@ CLIPModel = transformers.CLIPModel.from_pretrained("openai/clip-vit-base-patch32
 _, _, test_ds = get_datasets()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+CLIPModel = CLIPModel.to(device)
 decoder = Decoder(test_ds.tokenizer.vocab_size).to(device)
 decoder.load_state_dict(torch.load("model_weights.pt", map_location=device))
 decoder.eval()
@@ -27,11 +30,12 @@ def get_test_item():
 
 def predict_caption(image):
   with torch.no_grad():
+    image = image.to(device)
     image_features = CLIPModel.get_image_features(image.unsqueeze(0))
   start_token = test_ds.tokenizer.bos_token_id
   end_token = test_ds.tokenizer.eos_token_id
 
-  text_input = torch.tensor([start_token]).unsqueeze(0)
+  text_input = torch.tensor([start_token]).unsqueeze(0).to(device)
 
   # Get predictions
   with torch.no_grad():
@@ -56,8 +60,6 @@ def display_test_image(image, title):
   image_pil = torchvision.transforms.ToPILImage()(image_denorm)
 
   # Display the image
-  import matplotlib.pyplot as plt
-
   plt.imshow(image_pil)
   plt.title(title)
   plt.axis("off")
